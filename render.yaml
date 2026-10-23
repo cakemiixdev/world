@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: world-hop-multiplayer
+    runtime: python
+    plan: free
+    buildCommand: python -m compileall -q multiplayer.py
+    startCommand: python multiplayer.py
+    healthCheckPath: /api/health
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: WORLD_HOP_ALLOWED_ORIGIN
+        sync: false

@@ -1,0 +1,20 @@
+{
+  "name": "world-hop",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "build:single": "node build.js single",
+    "test": "node --test",
+    "serve": "python server.py",
+    "serve:dist": "python server.py --directory dist",
+    "deploy": "wrangler pages deploy dist --project-name world-hop"
+  },
+  "dependencies": {
+    "three": "^0.160.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "wrangler": "^3.91.0"
+  }
+}

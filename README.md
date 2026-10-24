@@ -1,6 +1,6 @@
 # WORLD HOP!
 
-A browser-based block-built 3D exploration game built with plain JavaScript ES modules and Three.js, with a standalone 2D Retro Tower mode linked from the title screen. The game uses an original Roblox-like visual direction; it does not bundle or copy Minecraft or Roblox code, models, or textures.
+A browser-based block-built 3D exploration game built with plain JavaScript ES modules and Three.js. The game uses an original Roblox-like visual direction; it does not bundle or copy Minecraft or Roblox code, models, or textures.
 
 ## Run locally
 

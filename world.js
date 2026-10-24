@@ -730,7 +730,7 @@ export function buildWorld(scene, zoneId, destination = null) {
   const weatherKind = zone.id === 'snow' ? 'snow' : zone.id === 'desert' ? 'dust' : null;
   let weather = null;
   if (weatherKind) {
-    const count = weatherKind === 'snow' ? 140 : 80;
+    const count = weatherKind === 'snow' ? 220 : 100;
     const positions = new Float32Array(count * 3);
     for (let i = 0; i < positions.length; i += 3) {
       const x = (random() - 0.5) * 180;
@@ -742,10 +742,10 @@ export function buildWorld(scene, zoneId, destination = null) {
     const weatherGeometry = new THREE.BufferGeometry();
     weatherGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     const weatherMaterial = new THREE.PointsMaterial({
-      color: weatherKind === 'snow' ? 0xf3f8ff : 0xd9a35b,
-      size: weatherKind === 'snow' ? 0.16 : 0.12,
+      color: weatherKind === 'snow' ? 0xc3e2ff : 0xd9a35b,
+      size: weatherKind === 'snow' ? 0.3 : 0.2,
       transparent: true,
-      opacity: weatherKind === 'snow' ? 0.72 : 0.28,
+      opacity: weatherKind === 'snow' ? 0.8 : 0.32,
       depthWrite: false,
     });
     weather = new THREE.Points(weatherGeometry, weatherMaterial);

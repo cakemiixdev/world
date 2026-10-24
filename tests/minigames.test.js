@@ -174,6 +174,32 @@ test('rejects a course that does not match the current location', () => {
   manager.dispose();
 });
 
+test('adds biome weather as one batched, disposable particle field', () => {
+  const scene = new THREE.Scene();
+  const snowyWorld = buildWorld(scene, 'snow');
+  const snow = scene.children.find((object) => object.name === 'ambient-weather');
+  assert.ok(snow?.isPoints);
+  assert.equal(snow.geometry.attributes.position.count, 140);
+  const originalPositions = snow.geometry.attributes.position.array.slice();
+  snowyWorld.update(0.1);
+  assert.notDeepEqual(snow.geometry.attributes.position.array, originalPositions);
+
+  let snowDisposed = false;
+  snow.geometry.addEventListener('dispose', () => { snowDisposed = true; });
+  const desertWorld = buildWorld(scene, 'desert');
+  const dust = scene.children.find((object) => object.name === 'ambient-weather');
+  assert.ok(dust?.isPoints);
+  assert.equal(dust.geometry.attributes.position.count, 80);
+  assert.equal(snowDisposed, true);
+
+  let dustDisposed = false;
+  dust.geometry.addEventListener('dispose', () => { dustDisposed = true; });
+  desertWorld.update(0.1);
+  buildWorld(scene, 'hub');
+  assert.equal(dustDisposed, true);
+  assert.equal(scene.children.some((object) => object.name === 'ambient-weather'), false);
+});
+
 test('places Beacon Island water above the terrain for swimming', () => {
   const scene = new THREE.Scene();
   const world = buildWorld(scene, 'hub');

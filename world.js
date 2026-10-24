@@ -11,11 +11,13 @@ export const ZONES = {
   canyon: { id: 'canyon', name: 'THE SOUTH RIM',        country: 'UNITED STATES', sky: 0xd7a174, ground: 0xb86e45, tree: 0x69744a, trunk: 0x5b432f, hasWater: false, treeCount: 8, neighborRoute: [[-28, -25], [-8, -42], [24, -36], [46, -10], [32, 16], [0, 12]], landmark: { type: 'canyon', pos: [-22, -18], label: 'GRAND CANYON SOUTH RIM' } },
   garden: { id: 'garden', name: 'RIVERSIDE GARDENS',    country: 'INDIA',     sky: 0x9cc5cf, ground: 0x72925c, tree: 0x326341, trunk: 0x624b34, hasWater: true, treeCount: 20, neighborRoute: [[-28, -25], [-8, -42], [24, -36], [46, -10], [32, 16], [0, 12]], landmark: { type: 'dome', pos: [18, 12], label: 'TAJ MAHAL' } },
   mountain: { id: 'mountain', name: 'MUTIANYU RIDGE',   country: 'CHINA',     sky: 0xa9c7cf, ground: 0x64734c, tree: 0x31563b, trunk: 0x4d3e30, hasWater: false, treeCount: 24, neighborRoute: [[-49, -22], [-32, -47], [1, -46], [29, -18], [8, 12], [-31, 10]], landmark: { type: 'wall', pos: [19, 7], label: 'GREAT WALL · MUTIANYU' } },
+  ocean:   { id: 'ocean',   name: 'GREAT BARRIER REEF', country: 'AUSTRALIA', sky: 0x07516a, ground: 0x153b45, tree: 0x36a68c, trunk: 0x256f64, hasWater: true, treeCount: 12, neighborRoute: [[-24, -18], [-10, -34], [18, -30], [34, -10], [30, 14], [8, 22]], landmark: { type: 'reef', pos: [16, -18], label: 'GREAT BARRIER REEF' } },
 };
 
 function terrainHeight(x, z, zoneId, peakPosition = ZONES.snow.landmark.pos) {
   const d = Math.sqrt(x * x + z * z);
   const rolling = (Math.sin(x * 0.08) * 3 + Math.cos(z * 0.09) * 2.5 + Math.sin((x + z) * 0.04) * 5) * Math.min(1, d / 20);
+  if (zoneId === 'ocean') return -10 + Math.sin(x * 0.09) * 0.55 + Math.cos(z * 0.08) * 0.45;
   if (zoneId === 'desert') {
     return rolling * 0.35 + Math.sin(x * 0.11 + Math.cos(z * 0.06)) * 2.2;
   }
@@ -66,17 +68,17 @@ export function buildWorld(scene, zoneId, destination = null) {
   });
   scene.clear();
   scene.background = new THREE.Color(zone.sky);
-  scene.fog = new THREE.Fog(zone.sky, 125, 330);
+  scene.fog = zone.id === 'ocean' ? new THREE.Fog(zone.sky, 18, 150) : new THREE.Fog(zone.sky, 125, 330);
 
   // Lights
-  const sun = new THREE.DirectionalLight(0xfff4d6, 2.0);
+  const sun = new THREE.DirectionalLight(zone.id === 'ocean' ? 0x86d6e5 : 0xfff4d6, zone.id === 'ocean' ? 0.7 : 2.0);
   sun.position.set(60, 100, 40);
-  sun.castShadow = true;
+  sun.castShadow = zone.id !== 'ocean';
   sun.shadow.mapSize.set(1024, 1024);
   sun.shadow.camera.left = -125; sun.shadow.camera.right = 125;
   sun.shadow.camera.top = 125; sun.shadow.camera.bottom = -125;
   scene.add(sun);
-  scene.add(new THREE.AmbientLight(0x8899bb, 0.9));
+  scene.add(new THREE.AmbientLight(zone.id === 'ocean' ? 0x2b8296 : 0x8899bb, zone.id === 'ocean' ? 1.2 : 0.9));
   scene.add(new THREE.HemisphereLight(zone.sky, zone.ground, 0.5));
 
   // Ground heightmap
@@ -92,9 +94,18 @@ export function buildWorld(scene, zoneId, destination = null) {
   const cover = [];
   const isHomeBase = zone.id === 'hub' && (!destination || destination.id === 'hub');
 
-  // Water (hub only)
+  // Water
   let water = null;
-  if (zone.hasWater && (isHomeBase || zone.id === 'garden')) {
+  if (zone.id === 'ocean') {
+    const waterWidth = 220;
+    const waterDepth = 220;
+    const wgeo = new THREE.PlaneGeometry(waterWidth, waterDepth);
+    wgeo.rotateX(-Math.PI / 2);
+    water = new THREE.Mesh(wgeo, new THREE.MeshStandardMaterial({ color: 0x48bfd0, transparent: true, opacity: 0.22, roughness: 0.2, side: THREE.DoubleSide, depthWrite: false }));
+    water.position.set(0, 0, 0);
+    water.userData = { surfaceY: 0, minX: -110, maxX: 110, minZ: -110, maxZ: 110 };
+    scene.add(water);
+  } else if (zone.hasWater && (isHomeBase || zone.id === 'garden')) {
     const waterWidth = zone.id === 'garden' ? 48 : 60;
     const waterDepth = zone.id === 'garden' ? 12 : 60;
     const wgeo = new THREE.PlaneGeometry(waterWidth, waterDepth); wgeo.rotateX(-Math.PI / 2);
@@ -102,13 +113,7 @@ export function buildWorld(scene, zoneId, destination = null) {
     const waterX = -35;
     const waterZ = zone.id === 'garden' ? -20 : 25;
     water.position.set(waterX, terrainHeight(waterX, waterZ, zone.id, zone.landmark.pos) + 0.15, waterZ);
-    water.userData = {
-      surfaceY: water.position.y,
-      minX: water.position.x - waterWidth / 2,
-      maxX: water.position.x + waterWidth / 2,
-      minZ: water.position.z - waterDepth / 2,
-      maxZ: water.position.z + waterDepth / 2,
-    };
+    water.userData = { surfaceY: water.position.y, minX: water.position.x - waterWidth / 2, maxX: water.position.x + waterWidth / 2, minZ: water.position.z - waterDepth / 2, maxZ: water.position.z + waterDepth / 2 };
     scene.add(water);
   }
 
@@ -160,7 +165,37 @@ export function buildWorld(scene, zoneId, destination = null) {
   const stone = new THREE.MeshStandardMaterial({ color: 0xd9d4c8, flatShading: true, roughness: 1 });
   const goldStone = new THREE.MeshStandardMaterial({ color: 0xc9a96a, flatShading: true, roughness: 1 });
   const darkStone = new THREE.MeshStandardMaterial({ color: 0x79634a, flatShading: true, roughness: 1 });
-  if (lm.type === 'tower') {
+  if (lm.type === 'reef') {
+    const coralMaterials = [0xf07e7e, 0xffc45c, 0x43c5a6].map((color) => new THREE.MeshStandardMaterial({ color, flatShading: true, roughness: 1 }));
+    const reefStone = new THREE.Mesh(new THREE.DodecahedronGeometry(5.5, 0), new THREE.MeshStandardMaterial({ color: 0x376f70, flatShading: true, roughness: 1 }));
+    reefStone.position.y = 1.2;
+    landmark.add(reefStone);
+    for (let i = 0; i < 10; i++) {
+      const angle = (i / 10) * Math.PI * 2;
+      const height = 1.4 + (i % 4) * 0.55;
+      const coral = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.42, height, 5), coralMaterials[i % coralMaterials.length]);
+      coral.position.set(Math.cos(angle) * (2 + (i % 3)), height / 2 + 1, Math.sin(angle) * (2 + (i % 3)));
+      coral.rotation.z = Math.sin(i * 4) * 0.22;
+      landmark.add(coral);
+    }
+  } else if (lm.type === 'wreck') {
+    const hullMaterial = new THREE.MeshStandardMaterial({ color: 0x685743, flatShading: true, roughness: 1 });
+    const hull = new THREE.Mesh(new THREE.BoxGeometry(12, 2.2, 4.5), hullMaterial);
+    hull.position.set(0, 1.2, 0);
+    hull.rotation.y = -0.16;
+    landmark.add(hull);
+    for (let i = -2; i <= 2; i++) {
+      const rib = new THREE.Mesh(new THREE.BoxGeometry(0.32, 3.2, 4.8), hullMaterial);
+      rib.position.set(i * 2.1, 2.2, 0);
+      rib.rotation.z = i % 2 ? -0.12 : 0.12;
+      landmark.add(rib);
+    }
+    const mast = new THREE.Mesh(new THREE.BoxGeometry(0.45, 8, 0.45), hullMaterial);
+    mast.position.set(-2, 5, 0);
+    const spar = new THREE.Mesh(new THREE.BoxGeometry(5, 0.35, 0.35), hullMaterial);
+    spar.position.set(-2, 7.4, 0);
+    landmark.add(mast, spar);
+  } else if (lm.type === 'tower') {
     const base = new THREE.Mesh(new THREE.BoxGeometry(5, 1.2, 5), darkStone);
     base.position.y = 0.6;
     const shaft = new THREE.Mesh(new THREE.BoxGeometry(3, 9, 3), stone);
@@ -625,7 +660,20 @@ export function buildWorld(scene, zoneId, destination = null) {
   const evidencePosition = zone.destination?.evidence?.pos;
   for (let i = 0; i < zone.treeCount; i++) {
     const g = new THREE.Group();
-    if (zone.id === 'desert') {
+    if (zone.id === 'ocean') {
+      for (let stem = 0; stem < 3; stem++) {
+        const height = 2.6 + random() * 1.8;
+        const stalk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, height, 5), leafMat);
+        stalk.position.set((stem - 1) * 0.55, height / 2, 0);
+        g.add(stalk);
+        for (let leaf = 0; leaf < 2; leaf++) {
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(0.82, 0.16, 0.12), leafMat);
+          blade.position.set((stem - 1) * 0.55 + (leaf ? 0.35 : -0.35), height * (0.45 + leaf * 0.18), 0);
+          blade.rotation.z = leaf ? -0.38 : 0.38;
+          g.add(blade);
+        }
+      }
+    } else if (zone.id === 'desert') {
       const cactus = new THREE.Mesh(new THREE.BoxGeometry(0.9, 3.2, 0.9), leafMat);
       cactus.position.y = 1.6;
       const arm = new THREE.Mesh(new THREE.BoxGeometry(1.5, 0.45, 0.45), leafMat);
@@ -671,12 +719,14 @@ export function buildWorld(scene, zoneId, destination = null) {
     g.position.set(x, terrainHeight(x, z, zone.id, zone.landmark.pos), z);
     scene.add(g);
     occluders.push(g);
+    if (zone.id !== 'ocean') {
     cover.push({
       x,
       z,
       radius: zone.id === 'desert' ? 0.9 : 1,
       height: zone.id === 'desert' ? 3.2 : 4.5,
     });
+    }
   }
 
   // Low-poly rocks add scale and visual detail without obstructing routes.
@@ -714,7 +764,7 @@ export function buildWorld(scene, zoneId, destination = null) {
   // Clouds
   const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, flatShading: true, transparent: true, opacity: 0.9 });
   const clouds = [];
-  for (let i = 0; i < 12; i++) {
+  for (let i = 0; i < (zone.id === 'ocean' ? 0 : 12); i++) {
     const c = new THREE.Group();
     for (let j = 0; j < 3; j++) {
       const puff = new THREE.Mesh(new THREE.BoxGeometry(4 + random() * 3, 2, 4), cloudMat);

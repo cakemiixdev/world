@@ -12,7 +12,7 @@ npm install
 npm run serve
 ```
 
-Open `http://127.0.0.1:8000/code.html`. The source page loads Three.js from jsDelivr, so the source version needs an internet connection. Do not open the HTML file directly with `file://`. If the browser blocks pointer lock, clicking the world enables drag-to-look as a fallback.
+Open `http://127.0.0.1:8000/`. The source page loads Three.js from jsDelivr, so the source version needs an internet connection. Do not open the HTML file directly with `file://`. If the browser blocks pointer lock, clicking the world enables drag-to-look as a fallback.
 
 Quick feature check: open the field board, search `Everest` or `28.0026`, click an A–Z filter, then use the on-screen letter keys to edit the search. Select a destination, continue through the arrival frame, and talk to the contact with **E**. Choose a response to accept their mission, follow the compass to the named landmark, and press **E** to recover the requested item. The carry badge shows the item; follow the compass back to the contact and press **E** to turn it in and claim field tokens.
 
@@ -44,13 +44,13 @@ Mission progress, completed locations, discovered clues, and field tokens are sa
 npm run build
 ```
 
-This creates `dist/code.html`, `dist/bundle.js`, `dist/style.css`, and a Cloudflare Pages root redirect from `/` to `/code.html`; the bundle includes Three.js. Build a self-contained HTML file with:
+This creates `dist/index.html`, `dist/bundle.js`, `dist/style.css`, and a Cloudflare Pages redirect from `/code.html` to `/index.html`; the bundle includes Three.js. Build a self-contained HTML file with:
 
 ```powershell
 npm run build:single
 ```
 
-That writes `dist/code-single.html`. Preview the regular build at `http://127.0.0.1:8000/code.html` using `npm run serve:dist`. The game HTML entry point is `code.html`; Cloudflare Pages visitors should open `/code.html`.
+That writes `dist/index-single.html`. Preview the regular build at `http://127.0.0.1:8000/` using `npm run serve:dist`. The game HTML entry point is `index.html`.
 
 ## Friend rooms (Python API + Supabase)
 
@@ -94,7 +94,7 @@ Start at the field board to choose a country and exact destination. Search by co
 
 ## Project layout
 
-- `code.html` — game UI shell and Three.js import map
+- `index.html` — game UI shell and Three.js import map
 - `style.css` — high-contrast game UI
 - `main.js` — renderer, first-person camera, input/UI wiring, remote player visuals, and animation loop
 - `world.js` — biome presets, procedural terrain, and landmark assembly
@@ -119,4 +119,4 @@ Start at the field board to choose a country and exact destination. Search by co
 - `server.py` — Python standard-library HTTP server
 - `build.js` — esbuild regular and single-file builds
 
-`code.html` is the sole HTML source entry point and is copied to `dist/code.html` by the build.
+`index.html` is the sole HTML source entry point and is copied to `dist/index.html` by the build.

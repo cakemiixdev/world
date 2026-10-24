@@ -1241,7 +1241,8 @@ body {
   .touch-pad { grid-template-columns: repeat(3, 2.85rem); grid-template-rows: repeat(2, 2.85rem); gap: 0.2rem; }
   .touch-pad button, .touch-actions button { min-width: 2.75rem; min-height: 2.75rem; }
   .touch-actions { max-width: 7.5rem; grid-template-columns: repeat(2, minmax(2.75rem, 1fr)); }
-  .touch-controls-enabled .quest-widget { bottom: 8.3rem; width: min(14rem, calc(100vw - 1.3rem)); }
+  .touch-controls-enabled .quest-widget { bottom: 12rem; width: min(14rem, calc(100vw - 1.3rem)); }
+  .touch-controls-enabled .inventory { bottom: 8.9rem; }
 }
 
 .controls-screen {

@@ -857,6 +857,7 @@ try {
   const forward = new THREE.Vector3();
   function animate() {
     requestAnimationFrame(animate);
+    if (document.hidden) return;
     const dt = Math.min(clock.getDelta(), 0.05);
     handleGamepad(gamepadInput.poll());
 

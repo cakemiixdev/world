@@ -862,7 +862,9 @@ export function buildWorld(scene, zoneId, destination = null) {
       }
       if (water) {
         water.position.y = water.userData.surfaceY + Math.sin(elapsed * 1.3) * 0.08;
-        water.material.opacity = 0.68 + Math.sin(elapsed * 0.8) * 0.04;
+        water.material.opacity = zone.id === 'ocean'
+          ? 0.2 + Math.sin(elapsed * 0.8) * 0.025
+          : 0.68 + Math.sin(elapsed * 0.8) * 0.04;
       }
       witness.position.y = terrainHeight(witness.position.x, witness.position.z, zone.id, zone.landmark.pos) + Math.sin(elapsed * 1.4) * 0.035;
       witnessHead.rotation.y = Math.sin(elapsed * 0.75) * 0.12;

@@ -96,6 +96,35 @@ export class Player {
       );
       this.camera.rotation.set(this.fallbackPitch, this.fallbackYaw, 0);
     });
+    this.lookPointerId = null;
+    this.lastLookX = 0;
+    this.lastLookY = 0;
+    domElement.addEventListener('pointerdown', (event) => {
+      if (event.pointerType !== 'touch' || !this.controlsActive || this.controls.isLocked) return;
+      this.lookPointerId = event.pointerId;
+      this.lastLookX = event.clientX;
+      this.lastLookY = event.clientY;
+      domElement.setPointerCapture(event.pointerId);
+    });
+    domElement.addEventListener('pointermove', (event) => {
+      if (event.pointerType !== 'touch' || event.pointerId !== this.lookPointerId || !this.controlsActive) return;
+      const deltaX = event.clientX - this.lastLookX;
+      const deltaY = event.clientY - this.lastLookY;
+      this.lastLookX = event.clientX;
+      this.lastLookY = event.clientY;
+      this.fallbackYaw -= deltaX * 0.005;
+      this.fallbackPitch = THREE.MathUtils.clamp(
+        this.fallbackPitch - deltaY * 0.005,
+        -Math.PI / 2 + 0.02,
+        Math.PI / 2 - 0.02
+      );
+      this.camera.rotation.set(this.fallbackPitch, this.fallbackYaw, 0);
+    });
+    const endTouchLook = (event) => {
+      if (event.pointerId === this.lookPointerId) this.lookPointerId = null;
+    };
+    domElement.addEventListener('pointerup', endTouchLook);
+    domElement.addEventListener('pointercancel', endTouchLook);
     domElement.addEventListener('click', () => this.startLooking());
   }
 

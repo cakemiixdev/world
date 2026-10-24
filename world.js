@@ -59,7 +59,7 @@ export function buildWorld(scene, zoneId, destination = null) {
   } : baseZone;
   scene.traverse((object) => {
     if (object.isLight) object.shadow?.map?.dispose();
-    if (!object.isMesh) return;
+    if (!object.isMesh && !object.isPoints) return;
     object.geometry.dispose();
     const materials = Array.isArray(object.material) ? object.material : [object.material];
     materials.forEach((material) => material?.dispose());
@@ -727,6 +727,33 @@ export function buildWorld(scene, zoneId, destination = null) {
     scene.add(c);
   }
 
+  const weatherKind = zone.id === 'snow' ? 'snow' : zone.id === 'desert' ? 'dust' : null;
+  let weather = null;
+  if (weatherKind) {
+    const count = weatherKind === 'snow' ? 140 : 80;
+    const positions = new Float32Array(count * 3);
+    for (let i = 0; i < positions.length; i += 3) {
+      const x = (random() - 0.5) * 180;
+      const z = (random() - 0.5) * 180;
+      positions[i] = x;
+      positions[i + 1] = terrainHeight(x, z, zone.id, zone.landmark.pos) + 4 + random() * (weatherKind === 'snow' ? 28 : 12);
+      positions[i + 2] = z;
+    }
+    const weatherGeometry = new THREE.BufferGeometry();
+    weatherGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const weatherMaterial = new THREE.PointsMaterial({
+      color: weatherKind === 'snow' ? 0xf3f8ff : 0xd9a35b,
+      size: weatherKind === 'snow' ? 0.16 : 0.12,
+      transparent: true,
+      opacity: weatherKind === 'snow' ? 0.72 : 0.28,
+      depthWrite: false,
+    });
+    weather = new THREE.Points(weatherGeometry, weatherMaterial);
+    weather.name = 'ambient-weather';
+    weather.frustumCulled = false;
+    scene.add(weather);
+  }
+
   const spawn = new THREE.Vector3(0, terrainHeight(0, 10, zone.id, zone.landmark.pos) + 1.7, 10);
   let elapsed = 0;
   return {
@@ -764,6 +791,25 @@ export function buildWorld(scene, zoneId, destination = null) {
         cloud.position.x += cloud.userData.driftSpeed * delta;
         if (cloud.position.x > 140) cloud.position.x = -140;
       });
+      if (weather) {
+        const positions = weather.geometry.attributes.position;
+        const values = positions.array;
+        const fallSpeed = weatherKind === 'snow' ? 4.5 : 0.35;
+        const driftSpeed = weatherKind === 'snow' ? 0.22 : 0.65;
+        for (let i = 0; i < values.length; i += 3) {
+          values[i] += driftSpeed * delta;
+          if (values[i] > 90) values[i] = -90;
+          values[i + 1] -= fallSpeed * delta;
+          if (values[i + 1] <= terrainHeight(values[i], values[i + 2], zone.id, zone.landmark.pos)) {
+            const x = (random() - 0.5) * 180;
+            const z = (random() - 0.5) * 180;
+            values[i] = x;
+            values[i + 1] = terrainHeight(x, z, zone.id, zone.landmark.pos) + (weatherKind === 'snow' ? 30 : 14);
+            values[i + 2] = z;
+          }
+        }
+        positions.needsUpdate = true;
+      }
       if (water) {
         water.position.y = water.userData.surfaceY + Math.sin(elapsed * 1.3) * 0.08;
         water.material.opacity = 0.68 + Math.sin(elapsed * 0.8) * 0.04;

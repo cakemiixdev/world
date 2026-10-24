@@ -54,7 +54,7 @@ That writes `dist/index-single.html`. Preview the regular build at `http://127.0
 
 The single-player game is a static site and does not need a Node or Python server after deployment. In the repository, open **Settings → Pages**, choose **Deploy from a branch**, select **main** and **/(root)**, then save. GitHub Pages will serve `index.html` as the homepage. The browser needs an internet connection to load Three.js from jsDelivr.
 
-GitHub Pages cannot host the Python multiplayer API. To enable friend rooms, deploy the existing `render.yaml` Blueprint from this same repository and configure the server-only Supabase environment variables described below.
+GitHub Pages cannot host the Python multiplayer API. For a versioned setup guide and source snapshot, see the [Friend Rooms API v1.0 release](https://github.com/cakemiixdev/world/releases/tag/friend-rooms-v1.0.0). Deploy the included `render.yaml` Blueprint and configure the server-only Supabase variables described below; never expose the service-role key in the browser.
 
 ## Friend rooms (Python API + Supabase)
 

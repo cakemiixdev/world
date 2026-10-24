@@ -12,7 +12,8 @@ export const ZONES = {
   garden: { id: 'garden', name: 'RIVERSIDE GARDENS',    country: 'INDIA',     sky: 0x9cc5cf, ground: 0x72925c, tree: 0x326341, trunk: 0x624b34, hasWater: true, treeCount: 20, neighborRoute: [[-28, -25], [-8, -42], [24, -36], [46, -10], [32, 16], [0, 12]], landmark: { type: 'dome', pos: [18, 12], label: 'TAJ MAHAL' } },
   mountain: { id: 'mountain', name: 'MUTIANYU RIDGE',   country: 'CHINA',     sky: 0xa9c7cf, ground: 0x64734c, tree: 0x31563b, trunk: 0x4d3e30, hasWater: false, treeCount: 24, neighborRoute: [[-49, -22], [-32, -47], [1, -46], [29, -18], [8, 12], [-31, 10]], landmark: { type: 'wall', pos: [19, 7], label: 'GREAT WALL · MUTIANYU' } },
   ocean:   { id: 'ocean',   name: 'GREAT BARRIER REEF', country: 'AUSTRALIA', sky: 0x07516a, ground: 0x153b45, tree: 0x36a68c, trunk: 0x256f64, hasWater: true, treeCount: 12, neighborRoute: [[-24, -18], [-10, -34], [18, -30], [34, -10], [30, 14], [8, 22]], landmark: { type: 'reef', pos: [16, -18], label: 'GREAT BARRIER REEF' } },
-};
+  volcanic: { id: 'volcanic', name: 'REYKJANES LAVA FIELDS', country: 'ICELAND', sky: 0xc77b64, ground: 0x654348, tree: 0x5a7643, trunk: 0x453b35, hasWater: false, treeCount: 7, neighborRoute: [[-28, -25], [-8, -42], [24, -36], [46, -10], [32, 16], [0, 12]], landmark: { type: 'canyon', pos: [-18, -10], label: 'BASALT RIM' } },
+    savanna: { id: 'savanna', name: 'SERENGETI GRASSLAND', country: 'TANZANIA', sky: 0x91bf9e, ground: 0x9f9a52, tree: 0x6b7936, trunk: 0x76522e, hasWater: false, treeCount: 13, neighborRoute: [[-24, -18], [-10, -34], [18, -30], [34, -10], [30, 14], [8, 22]], landmark: { type: 'tower', pos: [16, -12], label: 'ACACIA WATCH' } },
 
 function terrainHeight(x, z, zoneId, peakPosition = ZONES.snow.landmark.pos) {
   const d = Math.sqrt(x * x + z * z);

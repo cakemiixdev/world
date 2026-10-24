@@ -997,7 +997,7 @@ try {
       sessionElapsed += dt;
       sessionDistance += previousPlayerPosition.distanceTo(camera.position);
     }
-    const interactionKeys = controllerConnected ? 'B / E' : 'E';
+    const interactionKeys = touchControlsToggle.checked ? 'USE' : controllerConnected ? 'B / E' : 'E';
     if (isPlaying && player.nearLadder) {
       interactPrompt.textContent = `${interactionKeys} · ${player.climbing ? 'LEAVE' : 'CLIMB'} LADDER`;
       interactPrompt.classList.remove('hidden');

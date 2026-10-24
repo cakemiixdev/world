@@ -1,6 +1,6 @@
 // main.js
 import * as THREE from 'three';
-import { buildWorld } from './world.js?v=reef-expedition-1';
+import { buildWorld } from './world.js?v=reef-expedition-2';
 import { Player } from './player.js';
 import { setupMap } from './map.js';
 import { ExplorerJournal } from './exploration.js';

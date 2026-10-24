@@ -24,6 +24,7 @@ function createPlayer(position = new THREE.Vector3(0, 1.7, 10)) {
   return {
     camera: { position },
     gliding: false,
+    crouching: false,
     onGround: true,
     setPathTarget(target) {
       this.pathTarget = target.clone();
@@ -35,9 +36,10 @@ test('offers each field trial only at its intended locations', () => {
   assert.deepEqual(getAvailableMinigames('snow').map((game) => game.id), [
     'everest-climb',
     'elytra-hoops',
+    'quiet-trail',
   ]);
-  assert.deepEqual(getAvailableMinigames('hub').map((game) => game.id), ['river-swim']);
-  assert.deepEqual(getAvailableMinigames('city'), []);
+  assert.deepEqual(getAvailableMinigames('hub').map((game) => game.id), ['river-swim', 'quiet-trail']);
+  assert.deepEqual(getAvailableMinigames('city').map((game) => game.id), ['quiet-trail']);
 });
 
 test('river course advances gates and saves a personal best', () => {
@@ -74,6 +76,36 @@ test('river course advances gates and saves a personal best', () => {
   }
   assert.equal(event.reward, 0);
   assert.equal(progressStore.load().fieldTokens, 15);
+  manager.dispose();
+});
+
+test('quiet trail requires crouching at every gate and awards its first-completion reward', () => {
+  const progressStore = new ProgressStore(createStorage());
+  const scene = new THREE.Scene();
+  const manager = new MinigameManager(scene, progressStore);
+  const player = createPlayer();
+  const world = {
+    zone: { id: 'city', destinationId: 'eiffel' },
+    outpost: new THREE.Vector3(30, 0, 40),
+    getGroundHeight: () => 0,
+  };
+  manager.setWorld(world);
+  manager.start('quiet-trail', world, player);
+
+  let event;
+  for (const [index, gate] of manager.course.gates.entries()) {
+    player.camera.position.copy(gate);
+    assert.equal(manager.update(0.5, player), null);
+    assert.equal(manager.course.checkpointIndex, index);
+    player.crouching = true;
+    event = manager.update(0.5, player);
+    player.crouching = false;
+    if (index < manager.course.gates.length - 1) assert.equal(event.type, 'checkpoint');
+  }
+
+  assert.equal(event.type, 'complete');
+  assert.equal(event.reward, 20);
+  assert.deepEqual([...progressStore.load().completedMinigames], ['quiet-trail']);
   manager.dispose();
 });
 

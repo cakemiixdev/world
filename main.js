@@ -48,11 +48,11 @@ window.addEventListener('unhandledrejection', (event) => {
 
 try {
   const canvas = getElement('scene');
-  const renderScale = 0.78;
+  const lowPowerDevice = window.matchMedia('(pointer: coarse)').matches || (navigator.hardwareConcurrency || 8) <= 4;   const renderScale = lowPowerDevice ? 0.62 : 0.78;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
   renderer.setPixelRatio(1);
   renderer.setSize(window.innerWidth * renderScale, window.innerHeight * renderScale, false);
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = !lowPowerDevice;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();

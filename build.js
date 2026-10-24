@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 const outputDir = path.join(root, 'dist');
-const htmlPath = path.join(root, 'code.html');
+const htmlPath = path.join(root, 'index.html');
 const stylesheetPath = path.join(root, 'style.css');
 if (process.argv.length > 3 || (process.argv[2] && process.argv[2] !== 'single')) {
   throw new Error('Usage: node build.js [single]');
@@ -30,21 +30,22 @@ const moduleScript = /<script type="module" src="\.\/main\.js"[^>]*><\/script>/;
 if (singleFile) {
   const css = await readFile(stylesheetPath, 'utf8');
   const stylesheetLink = '<link rel="stylesheet" href="./style.css" />';
-  if (!html.includes(stylesheetLink)) throw new Error('Could not find the stylesheet link in code.html.');
+  if (!html.includes(stylesheetLink)) throw new Error('Could not find the stylesheet link in index.html.');
   html = html.replace(stylesheetLink, `<style>\n${css}\n</style>`);
   const outputHtml = html.replace(moduleScript, `<script>\n${bundle}\n</script>`);
-  if (outputHtml === html) throw new Error('Could not find the game module script in code.html.');
+  if (outputHtml === html) throw new Error('Could not find the game module script in index.html.');
   html = outputHtml;
-  await writeFile(path.join(outputDir, 'code-single.html'), html);
+  await writeFile(path.join(outputDir, 'index-single.html'), html);
 } else {
   const outputHtml = html.replace(moduleScript, '<script src="./bundle.js"></script>');
-  if (outputHtml === html) throw new Error('Could not find the game module script in code.html.');
+  if (outputHtml === html) throw new Error('Could not find the game module script in index.html.');
   html = outputHtml;
   await Promise.all([
-    writeFile(path.join(outputDir, 'code.html'), html),
+    writeFile(path.join(outputDir, 'index.html'), html),
     writeFile(path.join(outputDir, 'bundle.js'), bundle),
     writeFile(path.join(outputDir, 'style.css'), await readFile(stylesheetPath)),
-    writeFile(path.join(outputDir, '_redirects'), '/ /code.html 200\n'),
+    // Keep old /code.html bookmarks working on Cloudflare Pages (301 to /index.html)
+    writeFile(path.join(outputDir, '_redirects'), '/code.html /index.html 301\n'),
   ]);
 }
 
@@ -63,4 +64,4 @@ try {
   if (error.code !== 'ENOENT') throw error;
 }
 
-console.log(singleFile ? 'Built dist/code-single.html' : 'Built dist/code.html and dist/bundle.js');
+console.log(singleFile ? 'Built dist/index-single.html' : 'Built dist/index.html and dist/bundle.js');

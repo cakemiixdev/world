@@ -4,12 +4,10 @@ A browser-based block-built 3D exploration game built with plain JavaScript ES m
 
 ## Run locally
 
-Install the allowed JavaScript dependencies, then start the Python standard-library server:
+Start the Python standard-library server (no npm installation is needed for a local preview):
 
 ```powershell
-cd C:\Users\Jaeth\Downloads\world
-npm install
-npm run serve
+py -3 server.py
 ```
 
 Open `http://127.0.0.1:8000/`. The source page loads Three.js from jsDelivr, so the source version needs an internet connection. Do not open the HTML file directly with `file://`. If the browser blocks pointer lock, clicking the world enables drag-to-look as a fallback.
@@ -51,6 +49,12 @@ npm run build:single
 ```
 
 That writes `dist/index-single.html`. Preview the regular build at `http://127.0.0.1:8000/` using `npm run serve:dist`. The game HTML entry point is `index.html`.
+
+## Publish the single-player game on GitHub Pages
+
+The single-player game is a static site and does not need a Node or Python server after deployment. In the repository, open **Settings → Pages**, choose **Deploy from a branch**, select **main** and **/(root)**, then save. GitHub Pages will serve `index.html` as the homepage. The browser needs an internet connection to load Three.js from jsDelivr.
+
+GitHub Pages cannot host the Python multiplayer API. To enable friend rooms, deploy the existing `render.yaml` Blueprint from this same repository and configure the server-only Supabase environment variables described below.
 
 ## Friend rooms (Python API + Supabase)
 

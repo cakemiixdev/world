@@ -70,6 +70,8 @@ export class GamepadInput {
       compassRight: button(15),
       dpadUp: button(12),
       dpadDown: button(13),
+      dpadLeft: button(14),
+      dpadRight: button(15),
     };
     const pressed = {};
     for (const [name, down] of Object.entries(held)) {

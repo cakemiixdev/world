@@ -13,6 +13,7 @@
     <h1 class="logo">World<br>Hop!</h1>
     <p class="tagline">Choose a place. Help someone. Bring it home.</p>
     <button id="btn-explore" class="btn">Open the Field Board</button>
+    <button id="btn-controls-open" class="btn ghost" type="button">CONTROLS &amp; ACCESSIBILITY</button>
     <button id="btn-multiplayer" class="btn ghost icon-button" type="button">
       <img src="https://img.icons8.com/?size=100&amp;id=NSy309h5SR8H&amp;format=png&amp;color=000000" alt="" aria-hidden="true">
       MULTIPLAYER ROOM
@@ -20,7 +21,31 @@
     <p class="menu-hint">SEARCH EIGHT PLACES BY COUNTRY, LANDMARK, OR COORDINATES. WASD MOVE · MOUSE LOOK · E TALK / PICK UP · SPACE JUMP · F GLIDE. CONTROLLER? CONNECT IT, THEN PRESS ANY BUTTON. FIND AN ITEM, RETURN IT, EARN FIELD TOKENS.</p>
   </div>
 
-  <div id="multiplayer-panel" class="screen multiplayer-screen hidden" role="dialog" aria-modal="true" aria-labelledby="multiplayer-title">
+<div id="controls-panel" class="screen controls-screen hidden" role="dialog" aria-modal="true" aria-labelledby="controls-title">
+    <section class="controls-card">
+      <div class="pause-kicker">WORLD HOP! · INPUT SETUP</div>
+      <h2 id="controls-title">PLAY YOUR WAY.</h2>
+      <div class="controls-grid">
+        <article class="controls-group">
+          <h3>KEYBOARD &amp; MOUSE</h3>
+          <p>WASD moves along the field path. Drag the world to look. Use E to talk, collect, or climb; Space to jump; C to crouch; Shift to sprint; F to glide; Q for a decoy; M for the field board; Esc to pause.</p>
+        </article>
+        <article class="controls-group">
+          <h3>TOUCH</h3>
+          <p>Enable the on-screen move pad and action buttons. Drag across the open world to look around. You can also use the map and pause buttons in the HUD.</p>
+          <label class="touch-toggle" for="touch-controls-toggle"><input id="touch-controls-toggle" type="checkbox"> SHOW TOUCH BUTTONS</label>
+        </article>
+        <article class="controls-group">
+          <h3>CONTROLLER</h3>
+          <p>Connect by USB or Bluetooth, press any controller button, then use the left stick to move and right stick to look. A jumps, B interacts, X throws a decoy, Y glides, LB crouches, RB sprints, and Start pauses.</p>
+          <p id="controls-controller-status" class="controls-status" role="status" aria-live="polite">No controller detected yet. Press a button after connecting.</p>
+        </article>
+      </div>
+      <div class="pause-actions"><button id="btn-controls-close" class="btn ghost" type="button">BACK</button></div>
+    </section>
+  </div>
+
+    <div id="multiplayer-panel" class="screen multiplayer-screen hidden" role="dialog" aria-modal="true" aria-labelledby="multiplayer-title">
     <section class="multiplayer-card">
       <div class="pause-kicker">WORLD HOP! · FRIEND SESSION</div>
       <h2 id="multiplayer-title">JOIN THE FIELD.</h2>
@@ -93,6 +118,21 @@
     </nav>
     <div id="carried-item" class="carried-item hidden" role="status" aria-live="polite"></div>
     <button id="interact-prompt" class="interact-prompt hidden" type="button">E · INTERACT</button>
+    <div id="touch-controls" class="touch-controls" aria-label="Touch movement controls">
+      <div class="touch-pad" role="group" aria-label="Move">
+        <button type="button" data-touch-key="KeyW" aria-label="Move forward">▲</button>
+        <button type="button" data-touch-key="KeyA" aria-label="Move left">◀</button>
+        <button type="button" data-touch-key="KeyS" aria-label="Move backward">▼</button>
+        <button type="button" data-touch-key="KeyD" aria-label="Move right">▶</button>
+      </div>
+      <div class="touch-actions" role="group" aria-label="Actions">
+        <button type="button" data-touch-key="Space">JUMP</button>
+        <button type="button" data-touch-key="KeyE">USE</button>
+        <button type="button" data-touch-key="KeyF">GLIDE</button>
+        <button type="button" data-touch-key="KeyC">HIDE</button>
+        <button type="button" data-touch-key="KeyQ">DECOY</button>
+      </div>
+    </div>
     <section class="quest-widget" aria-label="Current quest">
       <button id="quest-toggle" class="quest-toggle" type="button" aria-expanded="false" aria-controls="quest-details">
         <span class="quest-icon" aria-hidden="true">+</span>

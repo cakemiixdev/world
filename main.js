@@ -21,6 +21,10 @@ function getElement(id) {
   return element;
 }
 
+function setTextIfChanged(element, text) {
+  if (element.textContent !== text) element.textContent = text;
+}
+
 const loading = getElement('loading');
 function showError(message) {
   loading.classList.remove('hidden');
@@ -500,10 +504,10 @@ try {
   function updateStats() {
     const minutes = Math.floor(sessionElapsed / 60).toString().padStart(2, '0');
     const seconds = Math.floor(sessionElapsed % 60).toString().padStart(2, '0');
-    statTime.textContent = `TIME ${minutes}:${seconds}`;
-    statDistance.textContent = `DISTANCE ${Math.round(sessionDistance)} M`;
-    statClues.textContent = `CLUES ${journal.discoveredZones.size} / ${STARTER_DESTINATION_COUNT}`;
-    statTokens.textContent = `FIELD TOKENS ${fieldwork.fieldTokens}`;
+    setTextIfChanged(statTime, `TIME ${minutes}:${seconds}`);
+    setTextIfChanged(statDistance, `DISTANCE ${Math.round(sessionDistance)} M`);
+    setTextIfChanged(statClues, `CLUES ${journal.discoveredZones.size} / ${STARTER_DESTINATION_COUNT}`);
+    setTextIfChanged(statTokens, `FIELD TOKENS ${fieldwork.fieldTokens}`);
   }
 
   function availableNavigationTargets() {
@@ -523,16 +527,20 @@ try {
     ];
   }
 
+  const compassForward = new THREE.Vector3();
+  const compassTargetDirection = new THREE.Vector3();
+  const compassCardinals = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
+
   function updateCompass(forward, targetPosition, targetName) {
-    const flatForward = forward.clone();
+    const flatForward = compassForward.copy(forward);
     flatForward.y = 0;
     if (flatForward.lengthSq() < 0.001) flatForward.set(0, 0, -1);
     flatForward.normalize();
     const heading = (Math.atan2(flatForward.x, -flatForward.z) * 180 / Math.PI + 360) % 360;
-    const cardinal = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
-    compassHeading.textContent = cardinal[Math.round(heading / 45) % 8];
+    const cardinal = compassCardinals;
+    setTextIfChanged(compassHeading, cardinal[Math.round(heading / 45) % 8]);
 
-    const toTarget = targetPosition.clone().sub(camera.position);
+    const toTarget = compassTargetDirection.copy(targetPosition).sub(camera.position);
     toTarget.y = 0;
     if (toTarget.lengthSq() > 0.001) {
       toTarget.normalize();
@@ -540,10 +548,12 @@ try {
       const cross = flatForward.x * toTarget.z - flatForward.z * toTarget.x;
       compassTarget.style.transform = `rotate(${Math.atan2(cross, dot) * 180 / Math.PI}deg)`;
     }
-    compassTargetLabel.textContent = targetName.length > 18
+    const label = targetName.length > 18
       ? `${targetName.slice(0, 16)}…`
       : targetName;
-    compass.title = `Compass target: ${targetName}. Click or press V to change route.`;
+    setTextIfChanged(compassTargetLabel, label);
+    const title = `Compass target: ${targetName}. Click or press V to change route.`;
+    if (compass.title !== title) compass.title = title;
   }
 
   function cycleNavigationTarget() {

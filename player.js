@@ -426,6 +426,14 @@ export class Player {
       this.velocity.z = 0;
     }
 
+    if (world.zone.id === 'ocean' && this.inWater) {
+      const seabedY = world.getGroundHeight(this.camera.position.x, this.camera.position.z) + EYE;
+      if (this.camera.position.y < seabedY) {
+        this.camera.position.y = seabedY;
+        this.velocity.y = Math.max(0, this.velocity.y);
+      }
+    }
+
     // Ground / platform snapping
     this.raycaster.set(this.camera.position, DOWN);
     const hits = this.raycaster.intersectObjects(world.colliders, false);

@@ -141,6 +141,10 @@ try {
   const statClues = getElement('stat-clues');
   const statTokens = getElement('stat-tokens');
   const multiplayerPanel = getElement('multiplayer-panel');
+  const controlsPanel = getElement('controls-panel');
+  const touchControlsToggle = getElement('touch-controls-toggle');
+  const controlsControllerStatus = getElement('controls-controller-status');
+  const touchControlButtons = [...document.querySelectorAll('[data-touch-key]')];
   const pauseMultiplayerButton = getElement('btn-pause-multiplayer');
   const roomBadge = getElement('room-badge');
   const controllerStatus = getElement('controller-status');
@@ -162,6 +166,7 @@ try {
   let multiplayerReturnPaused = false;
   let lastGamepadId = '';
   let controllerConnected = false;
+  let controlsReturnPaused = false;
 
   function createRemotePlayer(playerName) {
     const root = new THREE.Group();
@@ -448,6 +453,18 @@ try {
     updateCompass(forward, targets[navigationTargetIndex].position, targets[navigationTargetIndex].label);
   }
 
+  function setTouchControlsEnabled(enabled, persist = true) {
+    touchControlsToggle.checked = Boolean(enabled);
+    document.body.classList.toggle('touch-controls-enabled', Boolean(enabled));
+    if (persist) localStorage.setItem('world-hop-touch-controls', String(Boolean(enabled)));
+  }
+
+  const savedTouchControls = localStorage.getItem('world-hop-touch-controls');
+  setTouchControlsEnabled(
+    savedTouchControls === null ? window.matchMedia('(pointer: coarse)').matches : savedTouchControls === 'true',
+    false
+  );
+
   function setFlashlight(enabled) {
     flashlightOn = enabled;
     flashlight.visible = enabled;
@@ -470,6 +487,31 @@ try {
     paused = false;
     pauseMenu.classList.add('hidden');
     player.startLooking();
+  }
+
+  function openControlsPanel(fromPause = false) {
+    controlsReturnPaused = fromPause;
+    menu.classList.add('hidden');
+    if (fromPause) pauseMenu.classList.add('hidden');
+    if (hasStarted) player.stopLooking();
+    controlsPanel.classList.remove('hidden');
+    controlsPanel.querySelector('button')?.focus();
+  }
+
+  function closeControlsPanel() {
+    controlsPanel.classList.add('hidden');
+    if (controlsReturnPaused && hasStarted) {
+      paused = true;
+      pauseMenu.classList.remove('hidden');
+      resumeButton.focus();
+    } else if (!hasStarted) {
+      menu.classList.remove('hidden');
+      getElement('btn-controls-open').focus();
+    } else {
+      paused = true;
+      pauseMenu.classList.remove('hidden');
+      resumeButton.focus();
+    }
   }
 
   function showVictoryScreen({ kicker, title, detail, reward = 0 }) {
@@ -573,7 +615,7 @@ try {
   }
 
   function moveControllerFocus(horizontal, vertical) {
-    const panel = [victoryPanel, challengePanel, pauseMenu, multiplayerPanel, mapPanel, storyPanel, menu]
+    const panel = [victoryPanel, challengePanel, pauseMenu, controlsPanel, multiplayerPanel, mapPanel, storyPanel, menu]
       .find((element) => !element.classList.contains('hidden'));
     if (!panel) return false;
     const controls = visibleControls(panel);
@@ -609,15 +651,18 @@ try {
   function handleGamepad(state) {
     controllerConnected = state.connected;
     if (state.connected && state.id !== lastGamepadId) {
-      controllerStatus.textContent = `CONTROLLER CONNECTED · ${state.id.slice(0, 18)} · ${state.mapping.toUpperCase()}`;
+      const message = 'CONTROLLER CONNECTED · ' + state.id.slice(0, 18) + ' · ' + state.mapping.toUpperCase();
+      setTextIfChanged(controllerStatus, message);
+      setTextIfChanged(controlsControllerStatus, message);
       lastGamepadId = state.id;
     } else if (!state.connected) {
-      controllerStatus.textContent = 'NO CONTROLLER · CONNECT USB / BLUETOOTH, THEN PRESS ANY BUTTON';
+      setTextIfChanged(controllerStatus, 'NO CONTROLLER · CONNECT USB / BLUETOOTH, THEN PRESS ANY BUTTON');
+      setTextIfChanged(controlsControllerStatus, 'No controller detected yet. Press a button after connecting.');
       lastGamepadId = '';
     }
 
     player.setGamepadState(state);
-    const inOverlay = [victoryPanel, challengePanel, pauseMenu, multiplayerPanel, mapPanel, storyPanel, menu]
+    const inOverlay = [victoryPanel, challengePanel, pauseMenu, controlsPanel, multiplayerPanel, mapPanel, storyPanel, menu]
       .some((element) => !element.classList.contains('hidden'));
     const pressEscape = () => document.dispatchEvent(new KeyboardEvent('keydown', {
       key: 'Escape',
@@ -638,7 +683,7 @@ try {
       if (state.pressed.dpadLeft) moveControllerFocus(-1, 0);
       if (state.pressed.dpadRight) moveControllerFocus(1, 0);
       if (state.pressed.jump) {
-        const activePanel = [victoryPanel, challengePanel, pauseMenu, multiplayerPanel, mapPanel, storyPanel, menu]
+        const activePanel = [victoryPanel, challengePanel, pauseMenu, controlsPanel, multiplayerPanel, mapPanel, storyPanel, menu]
           .find((element) => !element.classList.contains('hidden'));
         if (activePanel === storyPanel) {
           const continueButton = getElement('story-continue');
@@ -758,6 +803,43 @@ try {
     if (world.landmark) player.setPathTarget(world.landmark.position);
   }
 
+  getElement('btn-controls-open').addEventListener('click', () => openControlsPanel(false));
+  getElement('btn-controls-close').addEventListener('click', closeControlsPanel);
+  touchControlsToggle.addEventListener('change', () => setTouchControlsEnabled(touchControlsToggle.checked));
+
+  function dispatchTouchKey(code, type) {
+    const key = code === 'Space' ? ' ' : code === 'ShiftLeft' ? 'Shift' : code.replace(/^(Key|Digit)/, '').toLowerCase();
+    document.dispatchEvent(new KeyboardEvent(type, { code, key, bubbles: true, cancelable: true }));
+  }
+
+  function setTouchKey(button, pressed) {
+    const code = button.dataset.touchKey;
+    const count = touchControlButtons.filter((candidate) => candidate.dataset.touchKey === code && candidate.dataset.touchHeld === 'true').length;
+    if (pressed && button.dataset.touchHeld !== 'true') {
+      button.dataset.touchHeld = 'true';
+      button.classList.add('is-held');
+      if (count === 0) dispatchTouchKey(code, 'keydown');
+    } else if (!pressed && button.dataset.touchHeld === 'true') {
+      button.dataset.touchHeld = 'false';
+      button.classList.remove('is-held');
+      if (count <= 1) dispatchTouchKey(code, 'keyup');
+    }
+  }
+
+  touchControlButtons.forEach((button) => {
+    button.addEventListener('pointerdown', (event) => {
+      event.preventDefault();
+      button.setPointerCapture(event.pointerId);
+      setTouchKey(button, true);
+    });
+    const release = (event) => { event.preventDefault(); setTouchKey(button, false); };
+    button.addEventListener('pointerup', release);
+    button.addEventListener('pointercancel', release);
+    button.addEventListener('lostpointercapture', release);
+  });
+
+  window.addEventListener('blur', () => touchControlButtons.forEach((button) => setTouchKey(button, false)));
+
   getElement('btn-explore').addEventListener('click', () => {
     menu.classList.add('hidden');
     mapUI.open();
@@ -786,10 +868,7 @@ try {
   victoryCloseButton.addEventListener('click', closeVictoryScreen);
   pauseMultiplayerButton.addEventListener('click', () => openMultiplayerPanel(true));
   getElement('btn-multiplayer').addEventListener('click', () => openMultiplayerPanel(false));
-  pauseMenuButton.addEventListener('click', () => {
-    getElement('pause-controls').scrollIntoView({ behavior: 'smooth', block: 'center' });
-    pauseStatus.textContent = 'CONTROLS ARE LISTED BELOW.';
-  });
+  pauseMenuButton.addEventListener('click', () => openControlsPanel(true));
   refreshButton.addEventListener('click', () => window.location.reload());
   exitHelpButton.addEventListener('click', () => {
     pauseStatus.textContent = 'PRESS ALT + F4 TO CLOSE THIS GAME WINDOW. BROWSERS BLOCK WEB PAGES FROM CLOSING THEMSELVES.';
@@ -819,6 +898,8 @@ try {
       else closeChallenges();
     } else if (event.code === 'Escape' && !victoryPanel.classList.contains('hidden')) {
       closeVictoryScreen();
+    } else if (event.code === 'Escape' && !controlsPanel.classList.contains('hidden')) {
+      closeControlsPanel();
     } else if (event.code === 'Escape' && challengePanel && !challengePanel.classList.contains('hidden')) {
       closeChallenges();
     } else if (event.code === 'KeyM' && !event.repeat && !hud.classList.contains('hidden') && !story.isOpen() && !paused && challengePanel.classList.contains('hidden')) {

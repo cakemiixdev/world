@@ -671,9 +671,9 @@ try {
     }));
 
     if (state.pressed.pause) {
-      if (paused) resumeGame();
-      else if (hasStarted && !story.isOpen() && !mapUI.isOpen() && challengePanel.classList.contains('hidden')) pauseGame();
+      if (paused && !pauseMenu.classList.contains('hidden')) resumeGame();
       else if (inOverlay) pressEscape();
+      else if (hasStarted && !story.isOpen() && !mapUI.isOpen() && challengePanel.classList.contains('hidden')) pauseGame();
       else if (!hasStarted) mapUI.open();
     }
 

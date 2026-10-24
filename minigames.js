@@ -28,6 +28,16 @@ export const MINIGAMES = Object.freeze([
     airborne: true,
     reward: 25,
   }),
+  Object.freeze({
+    id: 'quiet-trail',
+    name: 'FIELD: QUIET TRAIL',
+    description: 'Crouch through every green signal gate without raising an alarm.',
+    zones: Object.freeze(['hub', 'desert', 'snow', 'city', 'forest', 'canyon', 'garden', 'mountain']),
+    color: 0x7ee08b,
+    airborne: false,
+    stealth: true,
+    reward: 20,
+  }),
 ]);
 
 const CHECKPOINT_RADIUS = 4.2;
@@ -184,7 +194,11 @@ export class MinigameManager {
     const position = player.camera.position;
     const closeEnough = Math.hypot(position.x - target.x, position.z - target.z) <= CHECKPOINT_RADIUS &&
       Math.abs(position.y - target.y) <= 6;
-    if (!closeEnough || (course.game.airborne && (!player.gliding || player.onGround))) return null;
+    if (
+      !closeEnough ||
+      (course.game.airborne && (!player.gliding || player.onGround)) ||
+      (course.game.stealth && !player.crouching)
+    ) return null;
 
     course.gateObjects[course.checkpointIndex].visible = false;
     course.checkpointIndex += 1;

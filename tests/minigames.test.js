@@ -179,7 +179,7 @@ test('adds biome weather as one batched, disposable particle field', () => {
   const snowyWorld = buildWorld(scene, 'snow');
   const snow = scene.children.find((object) => object.name === 'ambient-weather');
   assert.ok(snow?.isPoints);
-  assert.equal(snow.geometry.attributes.position.count, 140);
+  assert.equal(snow.geometry.attributes.position.count, 220);
   const originalPositions = snow.geometry.attributes.position.array.slice();
   snowyWorld.update(0.1);
   assert.notDeepEqual(snow.geometry.attributes.position.array, originalPositions);
@@ -189,7 +189,7 @@ test('adds biome weather as one batched, disposable particle field', () => {
   const desertWorld = buildWorld(scene, 'desert');
   const dust = scene.children.find((object) => object.name === 'ambient-weather');
   assert.ok(dust?.isPoints);
-  assert.equal(dust.geometry.attributes.position.count, 80);
+  assert.equal(dust.geometry.attributes.position.count, 100);
   assert.equal(snowDisposed, true);
 
   let dustDisposed = false;

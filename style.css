@@ -1240,3 +1240,18 @@ body {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0.01ms !important; }
 }
+
+@media (max-width: 600px) {
+  .letter-filter {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 0.45rem;
+    font-size: 0.68rem;
+  }
+
+  .keyboard-key {
+    min-width: 2rem;
+    height: 2.75rem;
+    font-size: 0.68rem;
+  }
+}

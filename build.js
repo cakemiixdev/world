@@ -25,7 +25,7 @@ const result = await build({
 const bundle = result.outputFiles[0].text;
 let html = await readFile(htmlPath, 'utf8');
 html = html.replace(/<script type="importmap">[\s\S]*?<\/script>\s*/i, '');
-const moduleScript = /<script type="module" src="\.\/main\.js"[^>]*><\/script>/;
+const moduleScript = /<script type="module" src="\.\/main\.js(?:\?[^"]*)?"[^>]*><\/script>/;
 
 if (singleFile) {
   const css = await readFile(stylesheetPath, 'utf8');

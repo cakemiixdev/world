@@ -45,6 +45,7 @@ export class Player {
     this.gamepadMoveY = 0;
     this.gamepadLookX = 0;
     this.gamepadLookY = 0;
+    this.gamepadJump = false;
     this.gamepadSprint = false;
     this.gamepadCrouch = false;
 
@@ -158,6 +159,7 @@ export class Player {
     this.gamepadMoveY = 0;
     this.gamepadLookX = 0;
     this.gamepadLookY = 0;
+    this.gamepadJump = false;
     this.gamepadSprint = false;
     this.gamepadCrouch = false;
   }
@@ -167,6 +169,7 @@ export class Player {
     this.gamepadMoveY = state.connected ? state.moveY : 0;
     this.gamepadLookX = state.connected ? state.lookX : 0;
     this.gamepadLookY = state.connected ? state.lookY : 0;
+    this.gamepadJump = Boolean(state.connected && state.held.jump);
     this.gamepadSprint = Boolean(state.connected && state.held.sprint);
     this.gamepadCrouch = Boolean(state.connected && state.held.crouch);
   }
@@ -346,8 +349,8 @@ export class Player {
       const targetY = surfaceY + EYE - 0.15;
       this.velocity.y += (targetY - this.camera.position.y) * 4 * delta;
       this.velocity.y *= Math.pow(0.88, delta * 60);
-      if (this.keys['ShiftLeft'] || this.keys['ShiftRight']) this.velocity.y -= 6 * delta;
-      if (this.keys['Space']) this.velocity.y += 6 * delta;
+      if (this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.gamepadSprint) this.velocity.y -= 6 * delta;
+      if (this.keys['Space'] || this.gamepadJump) this.velocity.y += 6 * delta;
     } else {
       const accel = this.sprinting ? 90 : this.onGround ? 60 : 20;
       this.velocity.x += dir.x * accel * delta;

@@ -346,11 +346,16 @@ export class Player {
       this.velocity.z += dir.z * 24 * delta;
       this.velocity.x *= Math.pow(0.9, delta * 60);
       this.velocity.z *= Math.pow(0.9, delta * 60);
-      const targetY = surfaceY + EYE - 0.15;
-      this.velocity.y += (targetY - this.camera.position.y) * 4 * delta;
-      this.velocity.y *= Math.pow(0.88, delta * 60);
-      if (this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.gamepadSprint) this.velocity.y -= 6 * delta;
-      if (this.keys['Space'] || this.gamepadJump) this.velocity.y += 6 * delta;
+      const diving = this.keys['ShiftLeft'] || this.keys['ShiftRight'] || this.gamepadSprint;
+      if (diving) {
+        this.velocity.y = Math.max(this.velocity.y - 15 * delta, -6);
+      } else {
+        const targetY = surfaceY + EYE - 0.15;
+        const buoyancy = THREE.MathUtils.clamp(targetY - this.camera.position.y, -5, 5);
+        this.velocity.y += buoyancy * 2.8 * delta;
+        if (this.keys['Space'] || this.gamepadJump) this.velocity.y += 10 * delta;
+      }
+      this.velocity.y *= Math.pow(0.9, delta * 60);
     } else {
       const accel = this.sprinting ? 90 : this.onGround ? 60 : 20;
       this.velocity.x += dir.x * accel * delta;

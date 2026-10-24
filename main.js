@@ -970,7 +970,9 @@ try {
         ? 'Follow the glowing hoops. Hold the glide control in the air and steer through each ring.'
         : minigames.activeGame.id === 'river-swim'
           ? 'Swim through the glowing gates in order. Space / A swims upward; Shift / RB dives.'
-          : 'Follow each blue gate up the ridge. The compass points to the next checkpoint.';
+          : minigames.activeGame.stealth
+            ? `Stay crouched with C${controllerConnected ? ' / LB' : ''} as you pass every green gate.`
+            : 'Follow each blue gate up the ridge. The compass points to the next checkpoint.';
     } else if (fieldwork.isReturning) {
       fieldTipCopy.textContent = `Follow the compass back to ${world.zone.destination.contact.split(' · ')[0]}. ${controllerConnected ? 'Press B' : 'Press E'} to return the item.`;
     } else if (fieldwork.isActive) {

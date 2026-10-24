@@ -55,3 +55,11 @@ test('reports disconnection and resets held inputs', () => {
   gamepad = makeGamepad({ buttons: { 9: true } });
   assert.equal(input.poll().pressed.pause, true);
 });
+test('exposes horizontal D-pad edges for controller-driven menus', () => {
+  const input = new GamepadInput(() => [makeGamepad({ buttons: { 14: true, 15: true } })]);
+  const state = input.poll();
+  assert.equal(state.held.dpadLeft, true);
+  assert.equal(state.held.dpadRight, true);
+  assert.equal(state.pressed.dpadLeft, true);
+  assert.equal(state.pressed.dpadRight, true);
+});

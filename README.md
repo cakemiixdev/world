@@ -10,7 +10,7 @@ Start the Python standard-library server (no npm installation is needed for a lo
 py -3 server.py
 ```
 
-Open `http://127.0.0.1:8000/`. The source page loads Three.js from jsDelivr, so the source version needs an internet connection. Do not open the HTML file directly with `file://`. If the browser blocks pointer lock, clicking the world enables drag-to-look as a fallback.
+Open `http://127.0.0.1:8000/`. The source page loads Three.js from jsDelivr, so the source version needs an internet connection. Do not open the HTML file directly with `file://`. Open **Controls & Accessibility** from the title screen or pause menu to choose keyboard, touch, or controller guidance. On touchscreens, enable the on-screen move pad and action buttons there; drag the open world to look around when pointer lock is unavailable.
 
 Quick feature check: open the field board, search `Everest` or `28.0026`, click an A–Z filter, then use the on-screen letter keys to edit the search. Select a destination, continue through the arrival frame, and talk to the contact with **E**. Choose a response to accept their mission, follow the compass to the named landmark, and press **E** to recover the requested item. The carry badge shows the item; follow the compass back to the contact and press **E** to turn it in and claim field tokens.
 
@@ -84,6 +84,7 @@ For local API development, configure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_K
 - **V** — cycle the compass between the active clue, landmark, and cave
 - **G** — open field trials when you are in a location with a challenge
 - **Gamepad** — left stick move, right stick look; A jump/confirm, B interact/back, X noise-maker, Y glide, LB crouch, RB sprint, LT flashlight, View map, Start pause, D-pad up challenges/down map/left-right compass
+- **Touchscreen** — open **Controls & Accessibility** and enable **Show touch buttons**; use the move pad and action buttons, drag the open world to look, and use the HUD map/pause buttons.
 
 For a gamepad, connect it by USB or pair it in your computer's Bluetooth settings, open the game, and press any controller button once. The browser only reports a controller after that first button press. The HUD shows whether the browser detected it and whether it reports a standard or generic layout.
 - **Escape** — pause/resume; click the world to continue after resuming

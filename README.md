@@ -84,7 +84,7 @@ For local API development, configure `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_K
 - **V** — cycle the compass between the active clue, landmark, and cave
 - **G** — open field trials when you are in a location with a challenge
 - **Gamepad** — left stick move, right stick look; A jump/confirm, B interact/back, X noise-maker, Y glide, LB crouch, RB sprint, LT flashlight, View map, Start pause, D-pad up challenges/down map/left-right compass
-- **Touchscreen** — open **Controls & Accessibility** and enable **Show touch buttons**; use the move pad and action buttons, drag the open world to look, and use the HUD map/pause buttons.
+- **Touchscreen** — open **Controls & Accessibility** and enable **Show touch buttons**; use the move pad, action buttons, and on-screen **MAP** button, drag the open world to look, and use **PAUSE** in the HUD.
 
 For a gamepad, connect it by USB or pair it in your computer's Bluetooth settings, open the game, and press any controller button once. The browser only reports a controller after that first button press. The HUD shows whether the browser detected it and whether it reports a standard or generic layout.
 - **Escape** — pause/resume; click the world to continue after resuming

@@ -875,8 +875,11 @@ try {
       setSpyglass(false);
     }
     const desiredFov = spyglassOn ? 24 : cameraBaseFov;
-    camera.fov = THREE.MathUtils.damp(camera.fov, desiredFov, 10, dt);
-    camera.updateProjectionMatrix();
+    const nextFov = THREE.MathUtils.damp(camera.fov, desiredFov, 10, dt);
+    if (Math.abs(camera.fov - nextFov) > 0.001) {
+      camera.fov = nextFov;
+      camera.updateProjectionMatrix();
+    }
     if (!paused) {
       world.update(dt);
       fieldwork.update(dt);
